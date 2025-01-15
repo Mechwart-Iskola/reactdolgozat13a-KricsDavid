@@ -1,4 +1,4 @@
-import ProductCard from "./ProductCard";
+
 import React, { useState, useEffect } from 'react';
 import "./App.css";
 
@@ -17,7 +17,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    // Adatok betöltése a JSON fájlból
+    
     fetch('/products.json')
       .then((response) => response.json())
       .then((data) => setProducts(data))
