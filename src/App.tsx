@@ -10,7 +10,7 @@ type Product = {
   image: string;
 };
 
-function App() {
+const App = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProduct, setFilteredProduct] = useState<Product | null>(null);
@@ -20,14 +20,23 @@ function App() {
     
     fetch('/products.json')
       .then((response) => response.json())
-      .then((data) => setProducts(data))
+      .then((data) => {
+        console.log('Loaded data:', data); 
+        setProducts(Array.isArray(data) ? data : []);
+      })
       .catch((error) => console.error('Error loading products:', error));
   }, []);
 
   const handleSearch = () => {
+    if (!Array.isArray(products)) {
+      setErrorMessage('Invalid product data.');
+      return;
+    }
+
     const result = products.find((product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
     if (result) {
       setFilteredProduct(result);
       setErrorMessage('');
@@ -38,10 +47,12 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className="product-card">
       <h1>Product Search</h1>
-      <div className="search-box">
+      <div className="search-section">
+        <label htmlFor="search">Search Product:</label>
         <input
+          id="search"
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -49,20 +60,22 @@ function App() {
         />
         <button onClick={handleSearch}>Search</button>
       </div>
-      <div className="result">
+      <div className="results-section">
         {filteredProduct ? (
-          <div className="product">
+          <div className="product-info">
             <img
               src={filteredProduct.image}
               alt={filteredProduct.name}
               className="product-image"
             />
-            <h2>{filteredProduct.name}</h2>
-            <p>Price: ${filteredProduct.price}</p>
-            <p>Category: {filteredProduct.category}</p>
+            <div className="product-details">
+              <p><strong>Name:</strong> {filteredProduct.name}</p>
+              <p><strong>Price:</strong> ${filteredProduct.price}</p>
+              <p><strong>Category:</strong> {filteredProduct.category}</p>
+            </div>
           </div>
         ) : (
-          errorMessage && <p className="error-message">{errorMessage}</p>
+          errorMessage && <p className="error">{errorMessage}</p>
         )}
       </div>
     </div>
